@@ -1,7 +1,13 @@
 require('dotenv').config();
 import { Client } from 'tmi.js';
 import { App } from './App';
-const { TWITCH_CHANNEL, TWITCH_DEBUG, TWITCH_LOG_LEVEL } = process.env;
+const { 
+  TWITCH_CHANNEL, 
+  TWITCH_DEBUG, 
+  TWITCH_LOG_LEVEL,
+  TWITCH_USER,
+  TWITCH_TOKEN,
+} = process.env;
 
 async function bootstrap() {
     try {
@@ -14,6 +20,10 @@ async function bootstrap() {
             connection: {
                 reconnect: true,
                 secure: true
+            },
+            identity: {
+              username: TWITCH_USER,
+              password: `oauth:${TWITCH_TOKEN}`
             },
             channels: [TWITCH_CHANNEL as string]
           })
