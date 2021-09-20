@@ -16,9 +16,21 @@ export default class BotService {
       return this.connected;
     }
 
+    public get defaultCommands(): BotCommand[] {
+      return [
+        {
+          name: '!hello',
+          exec: async (channel, userstate: ChatUserstate, message: string) => {
+            this.client.say(channel, 'world');
+          }
+        }
+      ]
+    }
+
     public async start() {
       try {
         await this.client.connect();
+        this.registerCommands(this.defaultCommands);
         this.client.on('message', this.onMessage.bind(this));
 
         this.connected = true; 
@@ -33,6 +45,10 @@ export default class BotService {
 
     public registerCommand(command: BotCommand) {
       this.commands.push(command);
+    }
+
+    public registerCommands(commands: BotCommand[]) {
+      commands.forEach((command) => this.registerCommand(command));
     }
 
     public async onMessage(
