@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@types/tmi.js": "^1.7.2",
+    "aedes": "^0.46.1",
     "dotenv": "^10.0.0",
     "tmi.js": "^1.8.5"
   },

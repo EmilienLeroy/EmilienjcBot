@@ -1,4 +1,5 @@
 require('dotenv').config();
+import aedes from 'aedes';
 import { Client } from 'tmi.js';
 import { App } from './App';
 const { 
@@ -26,7 +27,8 @@ async function bootstrap() {
               password: `oauth:${TWITCH_TOKEN}`
             },
             channels: [TWITCH_CHANNEL as string]
-          })
+          }),
+          mqtt: aedes(),
         });
 
         await app.start();

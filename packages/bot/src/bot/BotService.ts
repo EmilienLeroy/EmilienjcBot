@@ -40,7 +40,7 @@ export default class BotService {
     }
 
     public getCommand(commandName: string) {
-      return this.commands.find(({ name }) => name === commandName);
+      return this.commands.find(({ name }) => commandName.match(name));
     }
 
     public registerCommand(command: BotCommand) {
