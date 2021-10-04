@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "lerna run dev --parallel",
-    "dev:bot": "npm run dev -- --scope bot",
-    "dev:robot": "npm run dev -- --scope robot"
+    "dev:bot": "npm run dev -- --scope @emilienjc/bot",
+    "dev:robot": "npm run dev -- --scope @emilienjc/robot"
   },
   "devDependencies": {
     "lerna": "^4.0.0"
