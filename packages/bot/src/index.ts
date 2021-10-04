@@ -1,4 +1,5 @@
 require('dotenv').config();
+import "reflect-metadata";
 import aedes from 'aedes';
 import { Client } from 'tmi.js';
 import { App } from './App';

@@ -1,13 +1,10 @@
 import { Aedes } from "aedes";
 import { createServer, Server } from 'net';
 import { ChatUserstate } from "tmi.js";
+import { inject, singleton } from "tsyringe";
 import { BotService } from "../bot";
 
-interface RobotConstructor {
-  mqtt: Aedes;
-  bot: BotService;
-}
-
+@singleton()
 export default class RobotService {
   private mqtt: Aedes;
   
@@ -15,7 +12,10 @@ export default class RobotService {
 
   private server: Server;
   
-  constructor({ mqtt, bot }: RobotConstructor) {
+  constructor(
+    @inject('mqtt') mqtt: Aedes, 
+    @inject(BotService) bot: BotService
+  ) {
     this.mqtt = mqtt;
     this.bot = bot;
     this.server = createServer(mqtt.handle);

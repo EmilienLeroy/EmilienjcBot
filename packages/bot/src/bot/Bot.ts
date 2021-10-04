@@ -1,8 +1,4 @@
-import { ChatUserstate, Client } from "tmi.js";
-
-export interface BotServiceContructor {
-  client: Client, 
-}
+import { ChatUserstate } from "tmi.js";
 
 export interface BotCommand {
   name: string;

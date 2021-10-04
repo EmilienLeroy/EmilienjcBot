@@ -1,12 +1,16 @@
 import { ChatUserstate, Client } from "tmi.js";
-import { BotCommand, BotServiceContructor } from "./Bot";
+import { inject, singleton } from "tsyringe";
+import { BotCommand } from "./Bot";
 
+@singleton()
 export default class BotService {
     private client: Client;
     private connected: boolean;
     private commands: BotCommand[];
 
-    constructor({ client }: BotServiceContructor) {
+    constructor(
+      @inject('irc') client: Client
+    ) {
       this.client = client;
       this.connected = false;
       this.commands = [];
