@@ -1,30 +1,31 @@
 import { ChatUserstate, Client } from "tmi.js";
 import { inject, singleton } from "tsyringe";
-import { BotCommand } from "./Bot";
+import { CommandManager, Command } from "@emilienjc/command";
 
 @singleton()
 export default class BotService {
     private client: Client;
     private connected: boolean;
-    private commands: BotCommand[];
+    private commandManager: CommandManager;
 
     constructor(
-      @inject('irc') client: Client
+      @inject('irc') client: Client,
+      @inject('commands') commandManager: CommandManager
     ) {
       this.client = client;
+      this.commandManager = commandManager;
       this.connected = false;
-      this.commands = [];
     }
 
     public get isConnected() {
       return this.connected;
     }
 
-    public get defaultCommands(): BotCommand[] {
+    public get defaultCommands(): Command[] {
       return [
         {
           name: '!hello',
-          exec: async (channel, userstate: ChatUserstate, message: string) => {
+          exec: async (channel) => {
             this.client.say(channel, 'world');
           }
         }
@@ -34,25 +35,13 @@ export default class BotService {
     public async start() {
       try {
         await this.client.connect();
-        this.registerCommands(this.defaultCommands);
+        this.commandManager.registerCommands(this.defaultCommands);
         this.client.on('message', this.onMessage.bind(this));
 
         this.connected = true; 
       } catch (error) {
 
       }
-    }
-
-    public getCommand(commandName: string) {
-      return this.commands.find(({ name }) => commandName.match(name));
-    }
-
-    public registerCommand(command: BotCommand) {
-      this.commands.push(command);
-    }
-
-    public registerCommands(commands: BotCommand[]) {
-      commands.forEach((command) => this.registerCommand(command));
     }
 
     public async onMessage(
@@ -65,7 +54,7 @@ export default class BotService {
         return;
       }
 
-      const command = this.getCommand(message.toLocaleLowerCase());
+      const command = this.commandManager.getCommand(message.toLocaleLowerCase());
       
       if (command) {
         await command.exec(channel, userstate, message);

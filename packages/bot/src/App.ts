@@ -3,6 +3,7 @@ import { Client } from "tmi.js";
 import { container } from "tsyringe";
 import { BotService } from "./bot";
 import { RobotService } from "./robot";
+import { CommandManager } from '@emilienjc/command';
 
 interface AppConstructor {
   client: Client;
@@ -17,6 +18,7 @@ export class App {
   constructor({ client, mqtt }: AppConstructor) {
     container.register<Client>('irc', {  useValue: client })
     container.register<Aedes>('mqtt', { useValue: mqtt })
+    container.register<CommandManager>('commands', CommandManager);
     
     this.botService = container.resolve(BotService)
     this.robotService = container.resolve(RobotService);

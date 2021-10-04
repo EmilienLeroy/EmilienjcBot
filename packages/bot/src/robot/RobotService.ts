@@ -1,37 +1,39 @@
 import { Aedes } from "aedes";
 import { createServer, Server } from 'net';
-import { ChatUserstate } from "tmi.js";
+import { ChatUserstate, Userstate } from "tmi.js";
 import { inject, singleton } from "tsyringe";
-import { BotService } from "../bot";
+import { CommandManager, Command } from "@emilienjc/command";
 
 @singleton()
 export default class RobotService {
   private mqtt: Aedes;
   
-  private bot: BotService;
+  private commandManager: CommandManager;
 
   private server: Server;
   
   constructor(
     @inject('mqtt') mqtt: Aedes, 
-    @inject(BotService) bot: BotService
+    @inject('commands') commandManager: CommandManager
   ) {
     this.mqtt = mqtt;
-    this.bot = bot;
+    this.commandManager = commandManager;
     this.server = createServer(mqtt.handle);
   }
 
   public onStart() {
-    this.bot.registerCommand({
+    const led = {
       name: '!led',
-      exec: async (channel: string, userstate: ChatUserstate, message: string) => {
+      exec: async (subscriber, payload: Userstate, message: string) => {
         const status = message.split(' ')[1];
 
         if (status === 'up' || status === 'down') {
           this.mqtt.publish({ topic: '/led', payload: status } as any, (err) => {})
         }
       }
-    })
+    } as Command;
+
+    this.commandManager.registerCommand(led);
   }
 
   public async start() {
