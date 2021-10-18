@@ -18,7 +18,7 @@ export class App {
   constructor({ client, mqtt }: AppConstructor) {
     container.register<Client>('irc', {  useValue: client })
     container.register<Aedes>('mqtt', { useValue: mqtt })
-    container.register<CommandManager>('commands', CommandManager);
+    container.register<CommandManager>('commands', { useValue: new CommandManager() });
     
     this.botService = container.resolve(BotService)
     this.robotService = container.resolve(RobotService);
