@@ -12,15 +12,15 @@ interface AppConstructor {
 
 export class App {
   private botService: BotService;
-  private ledService: LedService;
+  
 
   constructor({ mqtt, led }: AppConstructor) {
     container.register<Client>('mqtt', {  useValue: mqtt })
     container.register<Gpio>('led', { useValue: led })
-    container.register<CommandManager>('commands', CommandManager);
+    container.register<CommandManager>('commands', { useValue: new CommandManager() });
+    container.resolve(LedService);
 
     this.botService = container.resolve(BotService);
-    this.ledService = container.resolve(LedService);
   }
 
   public start() {

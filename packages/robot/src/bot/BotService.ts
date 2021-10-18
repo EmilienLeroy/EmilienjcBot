@@ -1,12 +1,18 @@
 import { Client, IPublishPacket } from 'mqtt';
 import { inject, singleton } from 'tsyringe';
+import { CommandManager } from '@emilienjc/command';
 
 @singleton()
 export default class BotService {
   private mqtt: Client;
+  private commandManager: CommandManager;
 
-  constructor(@inject('mqtt') mqtt: Client) {
+  constructor(
+    @inject('mqtt') mqtt: Client,
+    @inject('commands') commandManager: CommandManager
+  ) {
     this.mqtt = mqtt;
+    this.commandManager = commandManager;
   }
 
   public start() {
@@ -24,7 +30,11 @@ export default class BotService {
     console.log(error);
   }
 
-  private onMessage(topic: string, payload: Buffer, packet: IPublishPacket) {
-    
+  private async onMessage(topic: string, payload: Buffer, packet: IPublishPacket) {
+    const command = this.commandManager.getCommand(topic);
+
+    if (command) {
+      await command.exec(topic, payload, packet);
+    }
   }
 }
