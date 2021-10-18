@@ -1,13 +1,11 @@
 import { Client, IPublishPacket } from 'mqtt';
+import { inject, singleton } from 'tsyringe';
 
-interface BotServiceConstructor {
-  mqtt: Client;
-}
-
+@singleton()
 export default class BotService {
   private mqtt: Client;
 
-  constructor({ mqtt }: BotServiceConstructor) {
+  constructor(@inject('mqtt') mqtt: Client) {
     this.mqtt = mqtt;
   }
 

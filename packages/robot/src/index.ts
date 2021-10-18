@@ -1,5 +1,5 @@
 require('dotenv').config();
-
+import "reflect-metadata";
 import { connect } from "mqtt";
 import { Gpio } from "onoff";
 import { App } from "./App";
@@ -13,7 +13,7 @@ async function bootstrap() {
   try {
     const app = new App({
       mqtt: connect(BOT_URL),
-      gpio: new Gpio(Number(LED_GPIO), 'out')
+      led: new Gpio(Number(LED_GPIO), 'out')
     });
 
     app.start();

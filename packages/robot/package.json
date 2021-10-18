@@ -22,9 +22,12 @@
     "url": "https://github.com/EmilienLeroy/EmilienjcBot/issues"
   },
   "dependencies": {
+    "@emilienjc/command": "*",
     "dotenv": "^10.0.0",
     "mqtt": "^4.2.8",
-    "onoff": "^6.0.3"
+    "onoff": "^6.0.3",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.6.0"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",

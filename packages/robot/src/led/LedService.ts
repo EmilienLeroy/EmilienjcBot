@@ -1,14 +1,12 @@
 import { Gpio } from "onoff";
+import { inject, singleton } from "tsyringe";
 
-interface LedServiceConstructor {
-  gpio: Gpio;
-}
-
+@singleton()
 export default class LedService {
   private gpio: Gpio;
 
-  constructor({ gpio }: LedServiceConstructor) {
-    this.gpio = gpio;
+  constructor(@inject('led') led: Gpio) {
+    this.gpio = led;
   }  
 
   public up() {
