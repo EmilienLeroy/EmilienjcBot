@@ -10,32 +10,18 @@ import { container } from 'tsyringe';
 interface AppConstructor {
   mqtt: Client;
   led: Gpio;
+  drives?: Drive[];
 }
 
 export class App {
   private botService: BotService;
   
-
-  constructor({ mqtt, led }: AppConstructor) {
+  constructor({ mqtt, led, drives = [] }: AppConstructor) {
     container.register<CommandManager>('commands', { useValue: new CommandManager() });
     container.register<Client>('mqtt', {  useValue: mqtt });
     container.register<Gpio>('led', { useValue: led });
 
-    // @TODO: USE ENV VAR
-    container.register<Drive>('drive', { 
-      useValue: new L293DDrive({
-        left: {
-          A: new Gpio(4, 'out'),
-          B: new Gpio(17, 'out'),
-          enable: new Gpio(16, 'out'),
-        },
-        right: {
-          A: new Gpio(13, 'out'),
-          B: new Gpio(19, 'out'),
-          enable: new Gpio(5, 'out'),
-        }
-      }),
-    });
+    drives.forEach((d) => container.register<Drive>('drive', { useValue: d }))
     
     container.resolve(LedService);
     container.resolve(CarService);
