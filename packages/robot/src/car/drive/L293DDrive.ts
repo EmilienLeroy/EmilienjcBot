@@ -1,25 +1,25 @@
 import { Gpio } from "onoff";
 import Drive from "./Drive";
 
-interface L2930Motor {
+interface L293DMotor {
   A: Gpio;
   B: Gpio;
   enable: Gpio;
 }
 
-interface L2930DriveConstructor {
-  left: L2930Motor;
-  right: L2930Motor;
+interface L293DDriveConstructor {
+  left: L293DMotor;
+  right: L293DMotor;
 }
 
 export default class L2930Drive implements Drive {
-  private motors: L2930DriveConstructor;
+  private motors: L293DDriveConstructor;
 
-  constructor(motors: L2930DriveConstructor) {
+  constructor(motors: L293DDriveConstructor) {
     this.motors = motors;
   }
 
-  private turnMotor(motor: L2930Motor  ,direction: 'clock' | 'unclock') {
+  private turnMotor(motor: L293DMotor  ,direction: 'clock' | 'unclock') {
     const a = direction === 'clock' ? 0 : 1;
     const b = direction === 'clock' ? 1 : 0;
 
@@ -29,13 +29,13 @@ export default class L2930Drive implements Drive {
   }
     
   public forward() {
-    Object.values(this.motors).forEach((motor: L2930Motor) => {
+    Object.values(this.motors).forEach((motor: L293DMotor) => {
       this.turnMotor(motor, 'clock');
     });
   }
 
   public backward() {
-    Object.values(this.motors).forEach((motor: L2930Motor) => {
+    Object.values(this.motors).forEach((motor: L293DMotor) => {
       this.turnMotor(motor, 'unclock');
     });
   }
@@ -49,7 +49,7 @@ export default class L2930Drive implements Drive {
   }
 
   public stop() {
-    Object.values(this.motors).forEach(({ enable }: L2930Motor) => {
+    Object.values(this.motors).forEach(({ enable }: L293DMotor) => {
       enable.writeSync(0);
     });
   }

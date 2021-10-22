@@ -2,7 +2,7 @@ import { Client } from 'mqtt';
 import { Gpio } from 'onoff';
 import { BotService } from './bot';
 import { LedService } from './led';
-import { CarService, Drive, L2930Drive } from './car';
+import { CarService, Drive, L293DDrive } from './car';
 import { CommandManager } from '@emilienjc/command';
 import { container } from 'tsyringe';
 
@@ -23,7 +23,7 @@ export class App {
 
     // @TODO: USE ENV VAR
     container.register<Drive>('drive', { 
-      useValue: new L2930Drive({
+      useValue: new L293DDrive({
         left: {
           A: new Gpio(4, 'out'),
           B: new Gpio(17, 'out'),
