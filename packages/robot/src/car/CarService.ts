@@ -10,10 +10,6 @@ export class CarService {
       this.drives = container.resolveAll('drive');
 
       // @TODO: Register commands /car
-      this.drives.forEach((drive) => drive.forward());
-      setTimeout(() => {
-        this.drives!.forEach((drive) => drive.stop());
-      }, 5000);
     } catch (error) {
       console.warn('No drive configured, the car will not forward ')
     }

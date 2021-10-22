@@ -24,15 +24,15 @@ export class App {
     // @TODO: USE ENV VAR
     container.register<Drive>('drive', { 
       useValue: new L2930Drive({
-        motor1: {
+        left: {
           A: new Gpio(4, 'out'),
           B: new Gpio(17, 'out'),
           enable: new Gpio(16, 'out'),
         },
-        motor2: {
-          A: new Gpio(20, 'out'),
-          B: new Gpio(21, 'out'),
-          enable: new Gpio(22, 'out'),
+        right: {
+          A: new Gpio(13, 'out'),
+          B: new Gpio(19, 'out'),
+          enable: new Gpio(5, 'out'),
         }
       }),
     });

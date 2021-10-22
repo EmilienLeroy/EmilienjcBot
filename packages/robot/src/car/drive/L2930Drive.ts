@@ -8,8 +8,8 @@ interface L2930Motor {
 }
 
 interface L2930DriveConstructor {
-  motor1: L2930Motor;
-  motor2: L2930Motor;
+  left: L2930Motor;
+  right: L2930Motor;
 }
 
 export default class L2930Drive implements Drive {
@@ -18,28 +18,37 @@ export default class L2930Drive implements Drive {
   constructor(motors: L2930DriveConstructor) {
     this.motors = motors;
   }
+
+  private turnMotor(motor: L2930Motor  ,direction: 'clock' | 'unclock') {
+    const a = direction === 'clock' ? 0 : 1;
+    const b = direction === 'clock' ? 1 : 0;
+
+    motor.A.writeSync(a);
+    motor.B.writeSync(b);
+    motor.enable.writeSync(1);
+  }
     
-  forward() {
+  public forward() {
     Object.values(this.motors).forEach((motor: L2930Motor) => {
-      motor.A.writeSync(1);
-      motor.B.writeSync(0);
-      motor.enable.writeSync(1);
+      this.turnMotor(motor, 'clock');
     });
   }
 
-  backward() {
-
+  public backward() {
+    Object.values(this.motors).forEach((motor: L2930Motor) => {
+      this.turnMotor(motor, 'unclock');
+    });
   }
 
-  turnLeft() {
-
+  public turnLeft() {
+    this.turnMotor(this.motors.right, 'clock');
   }
 
-  turnRight() {
-
+  public turnRight() {
+    this.turnMotor(this.motors.left, 'clock');
   }
 
-  stop() {
+  public stop() {
     Object.values(this.motors).forEach(({ enable }: L2930Motor) => {
       enable.writeSync(0);
     });
