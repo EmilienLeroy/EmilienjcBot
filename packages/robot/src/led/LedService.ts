@@ -1,30 +1,33 @@
 import { Gpio } from "onoff";
-import { inject, singleton } from "tsyringe";
+import { container, inject, singleton } from "tsyringe";
 import { CommandManager, Command } from "@emilienjc/command";
 import { IPublishPacket } from "mqtt";
 
 @singleton()
 export default class LedService {
-  private gpio: Gpio;
+  private leds?: Gpio[];
 
   constructor(
-    @inject('led') led: Gpio,
     @inject('commands') commandManager: CommandManager
   ) {
-    this.gpio = led;
-
-    commandManager.registerCommand({
-      name: '/led',
-      exec: this.onLedMessage.bind(this)
-    } as Command)
+    try {
+      this.leds = container.resolveAll('led');  
+      
+      commandManager.registerCommand({
+        name: '/led',
+        exec: this.onLedMessage.bind(this)
+      } as Command)
+    } catch (error) {
+      console.warn('No led configured nothing will light your day')
+    }
   }
 
   public up() {
-    this.gpio.writeSync(1);
+    this.leds?.forEach((led) => led.writeSync(1));
   }
 
   public down() {
-    this.gpio.writeSync(0);
+    this.leds?.forEach((led) => led.writeSync(0));
   }
 
   private onLedMessage(topic: string, payload: Buffer, packet: IPublishPacket) {

@@ -19,6 +19,17 @@ const {
 async function bootstrap() {
   try {
     const drives = [];
+    const leds = [];
+    
+    if (typeof LED_GPIO === 'string') {
+      leds.push(...LED_GPIO
+        .split(',')
+        .map((l) => {
+          const led = Number(l.trim().replace('[', '').replace(']', ''))
+
+          return new Gpio(led, 'out');
+        }));
+    }
 
     if (DRIVE_L293D_LEFT_ENABLE && DRIVE_L293D_RIGHT_ENABLE) {
       drives.push(new L293DDrive({
@@ -37,7 +48,7 @@ async function bootstrap() {
 
     const app = new App({
       mqtt: connect(BOT_URL),
-      led: new Gpio(Number(LED_GPIO), 'out'),
+      leds,
       drives,
     });
 
