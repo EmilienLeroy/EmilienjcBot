@@ -19,7 +19,10 @@ export default class BotService {
     this.mqtt.on('connect', this.onConnect.bind(this));
     this.mqtt.on('error', this.onError.bind(this));
     this.mqtt.on('message', this.onMessage.bind(this));
+
+    // @TODO: Move directly into the good service.
     this.mqtt.subscribe('/led');
+    this.mqtt.subscribe('/car');
   }
 
   private onConnect() {
