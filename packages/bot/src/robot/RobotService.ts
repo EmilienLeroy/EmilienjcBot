@@ -22,18 +22,34 @@ export default class RobotService {
   }
 
   public onStart() {
-    const led = {
-      name: '!led',
-      exec: async (subscriber, payload: Userstate, message: string) => {
-        const status = message.split(' ')[1];
-
-        if (status === 'up' || status === 'down') {
-          this.mqtt.publish({ topic: '/led', payload: status } as any, (err) => {})
-        }
+    this.commandManager.registerCommands([
+      {
+        name: '!led',
+        exec: this.publishLed.bind(this)
+      },{
+        name: '!car',
+        exec: this.publishCar.bind(this)
       }
-    } as Command;
+    ] as Command[]);
+  }
 
-    this.commandManager.registerCommand(led);
+  async publishLed(subscriber: string, payload: Userstate, message: string) {
+    const status = message.split(' ')[1];
+
+    if (status === 'up' || status === 'down') {
+      this.mqtt.publish({ topic: '/led', payload: status } as any, (err) => {})
+    }
+  }
+
+  async publishCar(subscriber: string, payload: Userstate, message: string) {
+    const [topic, action, delay] = message.split(' ');
+
+    if (['forward', 'backward', 'left', 'right'].includes(action)) {
+      this.mqtt.publish({ 
+        topic: '/car', 
+        payload: JSON.stringify({ action, delay }), 
+      } as any, (err) => {})
+    }
   }
 
   public async start() {
