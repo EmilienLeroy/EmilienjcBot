@@ -22,8 +22,8 @@ export class CarService {
     }
   }
 
-  public forward(delay?: string | number) {
-    this.drives?.forEach((d) => d.forward());
+  public move(direction: 'forward' | 'backward' | 'turnLeft' | 'turnRight', delay?: string | number) {
+    this.drives?.forEach((d) => d[direction]());
     this.stop(delay);
   }
 
@@ -46,19 +46,19 @@ export class CarService {
 
     switch (action) {
       case 'forward':
-        this.forward(delay);
+        this.move('forward', delay);
         break;
 
       case 'backward':
-        // @TODO: Add backward method
+        this.move('backward', delay);
         break;
 
       case 'right':
-        // @TODO: Add right method
+        this.move('turnRight', delay);
         break;
       
       case 'left':
-        // @TODO: Add left method
+        this.move('turnLeft', delay);
         break;
 
       default:
