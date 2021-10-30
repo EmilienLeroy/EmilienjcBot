@@ -6,11 +6,11 @@ import { CommandManager, Command } from "@emilienjc/command";
 export default class BotService {
     private client: Client;
     private connected: boolean;
-    private commandManager: CommandManager;
+    private commandManager: CommandManager<ChatUserstate, string>;
 
     constructor(
       @inject('irc') client: Client,
-      @inject('commands') commandManager: CommandManager
+      @inject('commands') commandManager: CommandManager<ChatUserstate, string>
     ) {
       this.client = client;
       this.commandManager = commandManager;
@@ -21,7 +21,7 @@ export default class BotService {
       return this.connected;
     }
 
-    public get defaultCommands(): Command[] {
+    public get defaultCommands(): Command<ChatUserstate, string>[] {
       return [
         {
           name: '!hello',
@@ -57,7 +57,11 @@ export default class BotService {
       const command = this.commandManager.getCommand(message.toLocaleLowerCase());
       
       if (command) {
-        await command.exec(channel, userstate, message);
+        this.commandManager.addToQueue(command, {
+          subscriber: channel,
+          payload: userstate,
+          message: message,
+        });
       }
     }
 }

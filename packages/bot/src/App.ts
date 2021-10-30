@@ -1,5 +1,5 @@
 import { Aedes } from "aedes";
-import { Client } from "tmi.js";
+import { ChatUserstate, Client } from "tmi.js";
 import { container } from "tsyringe";
 import { BotService } from "./bot";
 import { RobotService } from "./robot";
@@ -18,7 +18,9 @@ export class App {
   constructor({ client, mqtt }: AppConstructor) {
     container.register<Client>('irc', {  useValue: client })
     container.register<Aedes>('mqtt', { useValue: mqtt })
-    container.register<CommandManager>('commands', { useValue: new CommandManager() });
+    container.register<CommandManager<ChatUserstate, string>>('commands', { 
+      useValue: new CommandManager<ChatUserstate, string>() 
+    });
     
     this.botService = container.resolve(BotService)
     this.robotService = container.resolve(RobotService);

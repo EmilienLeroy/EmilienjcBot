@@ -8,13 +8,13 @@ import { CommandManager, Command } from "@emilienjc/command";
 export default class RobotService {
   private mqtt: Aedes;
   
-  private commandManager: CommandManager;
+  private commandManager: CommandManager<ChatUserstate, string>;
 
   private server: Server;
   
   constructor(
     @inject('mqtt') mqtt: Aedes, 
-    @inject('commands') commandManager: CommandManager
+    @inject('commands') commandManager: CommandManager<ChatUserstate, string>
   ) {
     this.mqtt = mqtt;
     this.commandManager = commandManager;
@@ -30,7 +30,7 @@ export default class RobotService {
         name: '!car',
         exec: this.publishCar.bind(this)
       }
-    ] as Command[]);
+    ] as Command<ChatUserstate, string>[]);
   }
 
   async publishLed(subscriber: string, payload: Userstate, message: string) {
