@@ -1,5 +1,5 @@
 import { CommandManager } from "@emilienjc/command";
-import { Client, connect } from "mqtt";
+import { Client, connect, IPublishPacket } from "mqtt";
 import { Gpio } from "onoff";
 import { container } from "tsyringe";
 import { Drive } from "../car";
@@ -26,7 +26,7 @@ export default function ConfigurationDecorator({ mqtt, leds, drives }: Configura
   } 
 
   return (constructor: Function) => {
-    container.register<CommandManager>('commands', { useValue: new CommandManager() });
+    container.register<CommandManager<Buffer, IPublishPacket>>('commands', { useValue: new CommandManager() });
     container.register<Client>('mqtt', {  useValue: connect(mqtt.brokerUrl, mqtt.opts) });
 
     ledsParse.forEach((l) => container.register<Gpio>('led', { useValue: l }));

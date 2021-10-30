@@ -5,11 +5,11 @@ import { CommandManager } from '@emilienjc/command';
 @singleton()
 export default class BotService {
   private mqtt: Client;
-  private commandManager: CommandManager;
+  private commandManager: CommandManager<Buffer, IPublishPacket>;
 
   constructor(
     @inject('mqtt') mqtt: Client,
-    @inject('commands') commandManager: CommandManager
+    @inject('commands') commandManager: CommandManager<Buffer, IPublishPacket>
   ) {
     this.mqtt = mqtt;
     this.commandManager = commandManager;
@@ -37,7 +37,11 @@ export default class BotService {
     const command = this.commandManager.getCommand(topic);
 
     if (command) {
-      await command.exec(topic, payload, packet);
+      this.commandManager.addToQueue(command, {
+        subscriber: topic,
+        message: packet,
+        payload,
+      });
     }
   }
 }

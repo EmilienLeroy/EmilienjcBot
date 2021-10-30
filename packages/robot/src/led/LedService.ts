@@ -8,7 +8,7 @@ export default class LedService {
   private leds?: Gpio[];
 
   constructor(
-    @inject('commands') commandManager: CommandManager
+    @inject('commands') commandManager: CommandManager<Buffer, IPublishPacket>
   ) {
     try {
       this.leds = container.resolveAll('led');  
@@ -16,7 +16,7 @@ export default class LedService {
       commandManager.registerCommand({
         name: '/led',
         exec: this.onLedMessage.bind(this)
-      } as Command)
+      } as Command<Buffer, IPublishPacket>)
     } catch (error) {
       console.warn('No led configured nothing will light your day')
     }

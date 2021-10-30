@@ -3,12 +3,14 @@ import { IPublishPacket } from "mqtt";
 import { container, inject, injectAll, singleton } from "tsyringe";
 import { Drive } from "./drive";
 
+type CarDirection = 'forward' | 'backward' | 'turnLeft' | 'turnRight'
+
 @singleton()
 export class CarService {
   private drives?: Drive[];
 
   constructor(
-    @inject('commands') commandManager: CommandManager,
+    @inject('commands') commandManager: CommandManager<Buffer, IPublishPacket>,
   ) {
     try {
       this.drives = container.resolveAll('drive');
@@ -16,49 +18,52 @@ export class CarService {
       commandManager.registerCommand({
         name: '/car',
         exec: this.onCarMessage.bind(this)
-      } as Command)
+      } as Command<Buffer, IPublishPacket>)
     } catch (error) {
       console.warn('No drive configured, the car will not forward ')
     }
   }
 
-  public move(direction: 'forward' | 'backward' | 'turnLeft' | 'turnRight', delay?: string | number) {
+  public async move(direction: CarDirection, delay?: string | number) {
     this.drives?.forEach((d) => d[direction]());
-    this.stop(delay);
+    await this.stop(delay);
   }
 
-  public stop(delay?: string | number) {
-    if (typeof delay === 'string') {
-      delay = Number(delay)
-    }
-    
-    if (!delay || Number.isNaN(delay)) {
-      delay = 1000;
-    }
-
-    setTimeout(() => {
-      this.drives?.forEach((d) => d.stop());
-    }, delay);
+  public stop(delay?: string | number): Promise<void> {
+    return new Promise((res) => {
+      if (typeof delay === 'string') {
+        delay = Number(delay)
+      }
+      
+      if (!delay || Number.isNaN(delay)) {
+        delay = 1000;
+      }
+  
+      setTimeout(() => {
+        this.drives?.forEach((d) => d.stop());
+        res();
+      }, delay);
+    });
   }
 
-  private onCarMessage(topic: string, payload: Buffer, packet: IPublishPacket) {
+  private async onCarMessage(topic: string, payload: Buffer, packet: IPublishPacket) {
     const { action, delay } = JSON.parse(payload.toString());
 
     switch (action) {
       case 'forward':
-        this.move('forward', delay);
+        await this.move('forward', delay);
         break;
 
       case 'backward':
-        this.move('backward', delay);
+        await this.move('backward', delay);
         break;
 
       case 'right':
-        this.move('turnRight', delay);
+        await this.move('turnRight', delay);
         break;
       
       case 'left':
-        this.move('turnLeft', delay);
+        await this.move('turnLeft', delay);
         break;
 
       default:
