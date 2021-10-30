@@ -1,9 +1,14 @@
+import EventEmitter from "events";
 import { injectable } from "tsyringe";
-import { QueuedCommand } from ".";
-import { Command } from "./Command";
+import { Command, QueuedCommand } from "./Command";
+
+declare interface CommandManager<T, S> {
+  on(event: 'addedToQueue', listener: (queuedCommand: QueuedCommand<T, S>) => void): this;
+  on(event: 'consumeQueue', listener: (queuedCommand: QueuedCommand<T, S>) => void): this;
+}
 
 @injectable()
-export default class CommandManager<T, S> {
+class CommandManager<T, S> extends EventEmitter {
   private commands: Command<T, S>[] = [];
 
   private queue: QueuedCommand<T, S>[] = [];
@@ -26,17 +31,13 @@ export default class CommandManager<T, S> {
     commands.forEach((command) => this.registerCommand(command));
   }
 
-  public addToQueue(
-    command: Command<T, S>, params: {
-      subscriber: string, 
-      payload: T, 
-      message: S 
-    }) {
-
-    this.queue.push({
-      command, 
-      params,
-    });
+  public addToQueue(command: Command<T, S>, params: {
+    subscriber: string, 
+    payload: T, 
+    message: S 
+  }) {
+    this.queue.push({ command, params });
+    this.emit('addedToQueue', { command, params });
 
     if (!this.queueInProgress) {
       this.consumeQueue();
@@ -49,6 +50,7 @@ export default class CommandManager<T, S> {
     if (!this.queueIsEmpty) {
       const { command, params } = this.queue[0]; 
       
+      this.emit('consumeQueue', { command, params });
       await command.exec(params.subscriber, params.payload, params.message);
       this.queue = this.queue.slice(1);
     }
@@ -61,3 +63,5 @@ export default class CommandManager<T, S> {
     await this.consumeQueue();
   }
 }
+
+export default CommandManager;
