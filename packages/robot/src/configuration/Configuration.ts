@@ -1,5 +1,6 @@
 import { IClientOptions } from "mqtt";
 import { Drive } from "../car";
+import { Display } from "../screen";
 
 export interface ConfigurationSchema {
   mqtt: {
@@ -8,4 +9,5 @@ export interface ConfigurationSchema {
   };
   leds?: number[] | string;
   drives?: Drive[];
+  displays?: Display[];
 }

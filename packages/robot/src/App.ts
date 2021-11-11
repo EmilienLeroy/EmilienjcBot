@@ -5,6 +5,8 @@ import { LedService } from './led';
 import { CarService, L293DDrive } from './car';
 import { container } from 'tsyringe';
 import { Configuration } from './configuration';
+import { ScreenService } from './screen';
+import { PCF8574Display } from './screen';
 
 const {
   BOT_URL,
@@ -15,6 +17,10 @@ const {
   DRIVE_L293D_RIGHT_A,
   DRIVE_L293D_RIGHT_B,
   DRIVE_L293D_RIGHT_ENABLE,
+  DISPLAY_PCF8574_BUS,
+  DISPLAY_PCF8574_ADDRESS,
+  DISPLAY_PCF8574_WIDTH,
+  DISPLAY_PCF8574_HEIGTH,
 } = process.env;
 
 @Configuration({
@@ -35,6 +41,14 @@ const {
         enable: new Gpio(Number(DRIVE_L293D_RIGHT_ENABLE), 'out'),
       }
     })
+  ],
+  displays: [
+    new PCF8574Display({
+      bus: Number(DISPLAY_PCF8574_BUS),
+      address: Number(DISPLAY_PCF8574_ADDRESS),
+      width: Number(DISPLAY_PCF8574_WIDTH),
+      heigth: Number(DISPLAY_PCF8574_HEIGTH),
+    })
   ]
 })
 export class App {
@@ -43,6 +57,7 @@ export class App {
   constructor() {
     container.resolve(LedService);
     container.resolve(CarService);
+    container.resolve(ScreenService);
 
     this.botService = container.resolve(BotService);
   }

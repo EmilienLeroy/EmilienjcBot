@@ -3,9 +3,10 @@ import { Client, connect, IPublishPacket } from "mqtt";
 import { Gpio } from "onoff";
 import { container } from "tsyringe";
 import { Drive } from "../car";
+import { Display } from "../screen";
 import { ConfigurationSchema } from "./Configuration";
 
-export default function ConfigurationDecorator({ mqtt, leds, drives }: ConfigurationSchema) {
+export default function ConfigurationDecorator({ mqtt, leds, drives, displays }: ConfigurationSchema) {
   let ledsParse: Gpio[] = [];
   
   if (typeof leds === 'string') {
@@ -31,5 +32,6 @@ export default function ConfigurationDecorator({ mqtt, leds, drives }: Configura
 
     ledsParse.forEach((l) => container.register<Gpio>('led', { useValue: l }));
     drives?.forEach((d) => container.register<Drive>('drive', { useValue: d }));
+    displays?.forEach((d) => container.register<Display>('display', { useValue: d }))
   }
 }
