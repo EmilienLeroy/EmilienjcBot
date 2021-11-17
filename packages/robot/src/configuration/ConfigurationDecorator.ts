@@ -4,34 +4,18 @@ import { Gpio } from "onoff";
 import { container } from "tsyringe";
 import { Drive } from "../car";
 import { Display } from "../screen";
-import { ConfigurationSchema } from "./Configuration";
+import { configureLed } from "./ConfigurationLed";
+import { configureDrive } from './ConfigurationDrive';
+import { configureDisplay } from "./ConfigurationDisplay";
+const { BOT_URL } = process.env;
 
-export default function ConfigurationDecorator({ mqtt, leds, drives, displays }: ConfigurationSchema) {
-  let ledsParse: Gpio[] = [];
-  
-  if (typeof leds === 'string') {
-    ledsParse = leds.split(',')
-      .map((l) => {
-        const led = Number(l.trim().replace('[', '').replace(']', ''))
-
-        return new Gpio(led, 'out');
-      });
-  }
-
-  if (Array.isArray(leds)) {
-    ledsParse = leds.map((led) => {
-      if (typeof led === 'number') {
-        return new Gpio(led, 'out');
-      }
-    }).filter(x => !!x) as Gpio[];
-  } 
-
+export default function ConfigurationDecorator() {
   return (constructor: Function) => {
     container.register<CommandManager<Buffer, IPublishPacket>>('commands', { useValue: new CommandManager() });
-    container.register<Client>('mqtt', {  useValue: connect(mqtt.brokerUrl, mqtt.opts) });
+    container.register<Client>('mqtt', {  useValue: connect(BOT_URL) });
 
-    ledsParse.forEach((l) => container.register<Gpio>('led', { useValue: l }));
-    drives?.forEach((d) => container.register<Drive>('drive', { useValue: d }));
-    displays?.forEach((d) => container.register<Display>('display', { useValue: d }))
+    configureLed().forEach((l) => container.register<Gpio>('led', { useValue: l }));
+    configureDrive().forEach((d) => container.register<Drive>('drive', { useValue: d }));
+    configureDisplay().forEach((d) => container.register<Display>('display', { useValue: d }));
   }
 }
